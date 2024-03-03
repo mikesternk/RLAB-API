@@ -1,5 +1,5 @@
-import * as Carousel from "./Carousel.js";
-import axios from "axios";
+// import * as Carousel from "./Carousel.js";
+// import axios from "axios";
 
 // The breed selection input element.
 const breedSelect = document.getElementById("breedSelect");
@@ -11,7 +11,7 @@ const progressBar = document.getElementById("progressBar");
 const getFavouritesBtn = document.getElementById("getFavouritesBtn");
 
 // Step 0: Store your API key here for reference and easy access.
-const API_KEY = "";
+const API_KEY = "live_Rs0F26pSomyEvHWjZm2r1z2uOpHY07vapkCMCTJcuY6CQcKheB46IZ5ocfK0SOHZ";
 
 /**
  * 1. Create an async function "initialLoad" that does the following:
@@ -21,6 +21,33 @@ const API_KEY = "";
  *  - Each option should display text equal to the name of the breed.
  * This function should execute immediately.
  */
+const initialLoad = async () => {
+    const response = "Https://api.thecatapi.com/v1/breeds";
+    
+    try{
+        const res = await fetch(response);
+        // console.log(response);
+        if (!res.ok){
+            throw new Error("Could not fetch resource")
+        }
+        const data = await res.json();
+        // console.log(data);
+
+        data.forEach(element => {
+            const option = document.createElement("option");
+            option.value = element.id;
+            option.textContent = element.name
+            console.log(option);
+
+        });
+
+        //     breedSelect.appendChild(option);
+    }
+    catch(error){
+        console.log(error);
+    }
+}
+initialLoad();
 
 /**
  * 2. Create an event handler for breedSelect that does the following:
@@ -88,9 +115,9 @@ const API_KEY = "";
  *   you delete that favourite using the API, giving this function "toggle" functionality.
  * - You can call this function by clicking on the heart at the top right of any image.
  */
-export async function favourite(imgId) {
+// export async function favourite(imgId) {
   // your code here
-}
+// }
 
 /**
  * 9. Test your favourite() function by creating a getFavourites() function.
