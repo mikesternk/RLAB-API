@@ -1,17 +1,93 @@
-// import * as Carousel from "./Carousel.js";
-// import axios from "axios";
+// function createCarouselItem(imgSrc, imgAlt, imgId) {
+//   const template = document.querySelector("#carouselItemTemplate");
+//   const clone = template.content.firstElementChild.cloneNode(true);
+
+// const { Carousel } = require("bootstrap");
+
+//   const img = clone.querySelector("img");
+//   img.src = imgSrc;
+//   img.alt = imgAlt;
+
+//   const favBtn = clone.querySelector(".favourite-button");
+//   favBtn.addEventListener("click", () => {
+//     favourite(imgId);
+//   });
+
+//   return clone;
+// }
+
+// function clear() {
+//   const carousel = document.querySelector("#carouselInner");
+//   while (carousel.firstChild) {
+//     carousel.removeChild(carousel.firstChild);
+//   }
+// }
+
+// function appendCarousel(element) {
+//   const carousel = document.querySelector("#carouselInner");
+
+//   const activeItem = document.querySelector(".carousel-item.active");
+//   if (!activeItem) element.classList.add("active");
+
+//   carousel.appendChild(element);
+// }
+
+// function start() {
+//   const multipleCardCarousel = document.querySelector(
+//     "#carouselExampleControls"
+//   );
+//   if (window.matchMedia("(min-width: 768px)").matches) {
+//     const carousel = new bootstrap.Carousel(multipleCardCarousel, {
+//       interval: false,
+//     });
+//     const carouselWidth = $(".carousel-inner")[0].scrollWidth;
+//     const cardWidth = $(".carousel-item").width();
+//     let scrollPosition = 0;
+//     $("#carouselExampleControls .carousel-control-next").unbind();
+//     $("#carouselExampleControls .carousel-control-next").on(
+//       "click",
+//       function () {
+//         if (scrollPosition < carouselWidth - cardWidth * 4) {
+//           scrollPosition += cardWidth;
+//           $("#carouselExampleControls .carousel-inner").animate(
+//             { scrollLeft: scrollPosition },
+//             600
+//           );
+//         }
+//       }
+//     );
+//     $("#carouselExampleControls .carousel-control-prev").unbind();
+//     $("#carouselExampleControls .carousel-control-prev").on(
+//       "click",
+//       function () {
+//         if (scrollPosition > 0) {
+//           scrollPosition -= cardWidth;
+//           $("#carouselExampleControls .carousel-inner").animate(
+//             { scrollLeft: scrollPosition },
+//             600
+//           );
+//         }
+//       }
+//     );
+//   } else {
+//     $(multipleCardCarousel).addClass("slide");
+//   }
+// }
 
 // The breed selection input element.
 const breedSelect = document.getElementById("breedSelect");
 // The information section div element.
 const infoDump = document.getElementById("infoDump");
+const myCarousel = document.getElementById("carouselExampleControls");
+
 // The progress bar div element.
 const progressBar = document.getElementById("progressBar");
 // The get favourites button element.
 const getFavouritesBtn = document.getElementById("getFavouritesBtn");
 
 // Step 0: Store your API key here for reference and easy access.
-const API_KEY = "live_Rs0F26pSomyEvHWjZm2r1z2uOpHY07vapkCMCTJcuY6CQcKheB46IZ5ocfK0SOHZ";
+const API_KEY =
+  "live_Rs0F26pSomyEvHWjZm2r1z2uOpHY07vapkCMCTJcuY6CQcKheB46IZ5ocfK0SOHZ";
 
 /**
  * 1. Create an async function "initialLoad" that does the following:
@@ -21,33 +97,6 @@ const API_KEY = "live_Rs0F26pSomyEvHWjZm2r1z2uOpHY07vapkCMCTJcuY6CQcKheB46IZ5ocf
  *  - Each option should display text equal to the name of the breed.
  * This function should execute immediately.
  */
-const initialLoad = async () => {
-    const response = "Https://api.thecatapi.com/v1/breeds";
-    
-    try{
-        const res = await fetch(response);
-        // console.log(response);
-        if (!res.ok){
-            throw new Error("Could not fetch resource")
-        }
-        const data = await res.json();
-        // console.log(data);
-
-        data.forEach(element => {
-            const option = document.createElement("option");
-            option.value = element.id;
-            option.textContent = element.name
-            console.log(option);
-
-        });
-
-        //     breedSelect.appendChild(option);
-    }
-    catch(error){
-        console.log(error);
-    }
-}
-initialLoad();
 
 /**
  * 2. Create an event handler for breedSelect that does the following:
@@ -115,9 +164,9 @@ initialLoad();
  *   you delete that favourite using the API, giving this function "toggle" functionality.
  * - You can call this function by clicking on the heart at the top right of any image.
  */
-// export async function favourite(imgId) {
+async function favourite(imgId) {
   // your code here
-// }
+}
 
 /**
  * 9. Test your favourite() function by creating a getFavourites() function.
@@ -136,3 +185,79 @@ initialLoad();
  * - Test other breeds as well. Not every breed has the same data available, so
  *   your code should account for this.
  */
+
+const initialLoad = async () => {
+  const response = "https://api.thecatapi.com/v1/breeds";
+
+  try {
+    const res = await fetch(response);
+    // console.log(response);
+    if (!res.ok) {
+      throw new Error("Could not fetch resource");
+    }
+    const data = await res.json();
+    console.log(data);
+
+    data.forEach((element) => {
+      const options = document.createElement("option");
+      options.value = element.id;
+      options.textContent = element.name;
+      //   console.log(options);
+      breedSelect.appendChild(options);
+      //   console.log(breedSelect);
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+initialLoad();
+// console.log(breedSelect);
+
+breedSelect.addEventListener("change", async () => {
+  const selectedBreedId = breedSelect.value;
+
+  if (selectedBreedId) {
+    try {
+      infoDump.innerHTML = "";
+      myCarousel.innerHTML = "";
+
+      const response = await fetch(
+        `https://api.thecatapi.com/v1/breeds/${selectedBreedId}`
+      );
+
+      if (!response.ok) {
+        throw new Error("Could not fetch resource");
+      }
+      const information = document.createElement("div");
+
+      const breedInfo = await response.json();
+      information.innerHTML = `
+        <h2>Name: ${breedInfo.name}</h2> 
+        <p><b>Description:</b> ${breedInfo.description}</p>
+        <p><b>Origin:</b> ${breedInfo.origin}</p>
+        <p><b>Temperament:</b> ${breedInfo.temperament}</p>
+        <p><b>Life Span</b> ${breedInfo.life_span}</p>
+        <p><b>Read More:</b><a href="${breedInfo.wikipedia_url}" target="blank">${breedInfo.wikipedia_url}</a></p>
+        `;
+
+      console.log(breedInfo);
+      console.log(breedInfo.name);
+      console.log(breedInfo.description);
+      console.log(breedInfo.id);
+      console.log(breedInfo.reference_image_id);
+
+      image = document.createElement("img");
+      image.src = `https://cdn2.thecatapi.com/images/${breedInfo.reference_image_id}.jpg`;
+      image.alt = breedInfo.name;
+      image.height = "300";
+
+      infoDump.appendChild(image);
+      infoDump.appendChild(information);
+
+      carouselItem = document.createElement("div");
+      carouselItem.classList.add("carousel-test");
+    } catch (error) {
+      console.log(error);
+    }
+  }
+});
